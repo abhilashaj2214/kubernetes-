@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vote
+spec:
+  strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 0%
+        maxUnavailable: 100%
+  selector:
+    matchLabels:
+      app: vote
+  replicas: 6
+  template:
+    metadata:
+      name: vote
+      labels:
+        app: vote
+    spec:
+      containers:
+        - name: vote
+          image: dipesh017/demo:vote
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: .1
+            limits:
+              memory: "128Mi"
+              cpu: 10
+      tolerations:
+      - key: "demo"
+        operator: "Equal"
+        value: "critical"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: demo
+                operator: In
+                values:
+                - critical
+                
+---
+
+apiVersion: v1
+
+kind: Service
+
+metadata:
+  name: vote
+  labels:
+    app: vote
+
+spec:
+  selector:
+    app: vote
+  type: LoadBalancer
+  ports:
+  - name: "vote-service"
+    protocol: TCP
+    port: 5000
+    targetPort: 80
