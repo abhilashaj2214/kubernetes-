@@ -1,0 +1,10 @@
+containers:
+        - name: vote
+          image: dipesh017/demo:vote
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: .3
+            limits:
+              memory: "128Mi"
+              cpu: 10
